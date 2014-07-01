@@ -21,3 +21,8 @@ fs.readFile('http://www.google.com' , function(err, data) {
 fs.writeFile(__dirname+'/files/vigour.html','https://github.com/',function(err, data) {
   if(err) info.error(err)
 })
+
+
+fs.remove(__dirname+'/files/bla', function() {
+  log.error('XXXX')
+})
