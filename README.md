@@ -40,10 +40,11 @@ fs.writeFile('somefile.txt', 'some data', function(err) {
 
 ### fs.readFile( *filename*, [options], *callback* )
 Read files.
+Adds functionality to filename can also be an url then it will try to load the file from the url
 
 Argument | Type | Default | Description
 ------ | ---- | ------- | -----------
-filename | String | |  Filename can also include path
+filename | String or URL | |  Filename can also include path
 callback | function() | |  Callback
 options | String or Object | | Client only supports encoding no flag
 
@@ -59,20 +60,30 @@ fs.readFile('somefile.txt', 'utf8', function(err, data) {
 fs.readFile('somefile.txt', { encoding: 'utf8' }, function(err, data) {
   console.log(data, err)
 })
+
+fs.readFile('http://www.example.com/test.txt', { encoding: 'utf8' }, function(err, data) {
+  console.log(data, err)
+})
 ```
 
 ### fs.writeFile( *filename*, data, [options], *callback* )
 Write file
+Adds functionality to data can also be an url then it will try to write the file from the url
 
 Argument | Type | Default | Description
 ------ | ---- | ------- | -----------
 filename | String | |  Filename can also include path
-data | String or Buffer | | Buffer can create difficulties on certain clients
+data | String or Buffer or URL | | Buffer can create difficulties on certain clients
 callback | function() | |  Callback
-options | String or Object | | Client supports encoding and mode if possible
+options | String or Object | | Client supports encoding and mode if possible. Adds url default on true
 
 ```javascript
-fs.writeFile('somefile.txt', function(err) {
+fs.writeFile('somefile.txt', 'data in a string', function(err) {
+  if(!err) console.log('succes!')
+})
+
+//if you do not want urls to be parsed add an option url:false
+fs.writeFile('somefile.txt','http://www.google.com', function(err) {
   if(!err) console.log('succes!')
 })
 ```
@@ -102,6 +113,20 @@ fs.mkdir('somefolder', function(err) {
   if(!err) console.log('succes!')
 })
 ```
+### fs.rmdir( *path*, *callback* )
+Remove a directory only works when its empty (POSIX)
+
+Argument | Type | Default | Description
+------ | ---- | ------- | -----------
+path | String | |  path
+callback | function() | |  Callback
+
+```javascript
+fs.rmdir('somefolder', function(err) {
+  if(!err) console.log('succes!')
+})
+```
+
 ### fs.rename( *oldPath*, *newPath*, *callback* )
 Rename a file, can also use this to move files
 
@@ -116,7 +141,19 @@ fs.rename('bla/somefolder', 'bur/somefolder/' function(err) {
   if(!err) console.log('succes!')
 })
 ```
+### fs.unlink( *path*, *callback* )
+Remove a file 
 
+Argument | Type | Default | Description
+------ | ---- | ------- | -----------
+path | String | |  path
+callback | function() | |  Callback
+
+```javascript
+fs.rename('bla/somefile.txt', function(err) {
+  if(!err) console.log('succes!')
+})
+```
 ### fs.exists( *path*, *callback* )
 Check if a file or folder exists
 
@@ -154,6 +191,21 @@ Uses js [Date object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Re
   mtime: Date,
   ctime: Date
 }
+```
+
+### fs.remove( *path*, *callback* )
+This is an addition to node's fs
+Remove a directory recursivly and clear all content, can also remove files
+
+Argument | Type | Default | Description
+------ | ---- | ------- | -----------
+path | String | |  path
+callback | function() | |  Callback
+
+```javascript
+fs.remove('somefolder', function(err) {
+  if(!err) console.log('succes!')
+})
 ```
 
 ## License
