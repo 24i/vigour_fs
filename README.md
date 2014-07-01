@@ -38,6 +38,9 @@ fs.writeFile('somefile.txt', 'some data', function(err) {
 
 ## API
 
+### fs.rootDir
+root directory of the filesystem
+
 ### fs.readFile( *filename*, [options], *callback* )
 Read files.
 Adds functionality to filename can also be an url then it will try to load the file from the url
