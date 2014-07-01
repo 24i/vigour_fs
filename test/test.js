@@ -22,7 +22,10 @@ fs.writeFile(__dirname+'/files/vigour.html','https://github.com/',function(err, 
   if(err) info.error(err)
 })
 
+fs.remove(__dirname+'/files/bla', function(err) {
+  if(!err) log.info('done')
+})
 
-fs.remove(__dirname+'/files/bla', function() {
-  log.error('XXXX')
+fs.mkdirp(__dirname+'/files/yuz/yub/yubbie',function(err) {
+  if(err)  log.error(err)
 })

@@ -100,13 +100,14 @@ fs.readdir('somefolder', function(err, files) {
   if(!err) console.log('succes!', files)
 })
 ```
-### fs.mkdir( *path*, *callback* )
+### fs.mkdir( *path*,[ *options* ], *callback* )
 Create a directory
 
 Argument | Type | Default | Description
 ------ | ---- | ------- | -----------
 path | String | |  path
 callback | function() | |  Callback
+options | Mode | | Defaults to 0777
 
 ```javascript
 fs.mkdir('somefolder', function(err) {
@@ -194,7 +195,7 @@ Uses js [Date object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Re
 ```
 
 ### fs.remove( *path*, *callback* )
-This is an addition to node's fs
+This is an addition to node's fs uses rimraf module
 Remove a directory recursivly and clear all content, can also remove files
 
 Argument | Type | Default | Description
@@ -207,6 +208,15 @@ fs.remove('somefolder', function(err) {
   if(!err) console.log('succes!')
 })
 ```
+### fs.mkdirp( *path*, [ *options* ], *callback*)
+Addition to fs uses mkdirp package
+Create a new directory and any necessary subdirectories at dir with octal permission string opts.mode. If opts is a non-object, it will be treated as the opts.mode.
+
+Argument | Type | Default | Description
+------ | ---- | ------- | -----------
+path | String | |  path
+options | Mode | 0777 | 
+callback | function() | |  Callback
 
 ## License
 
