@@ -28,6 +28,9 @@
   "bugs": {
     "url": "https://github.com/vigour-io/vigour-fs/issues"
   },
+  "devDependencies": {
+    "npmlog": "0.1.x"
+  },
   "dependencies": {
     "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
     "graceful-fs": "~3.0.2"
