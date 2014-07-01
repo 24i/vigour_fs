@@ -1,0 +1,36 @@
+{
+  "name": "vigour-fs",
+  "version": "0.0.0",
+  "description": "fs used to generilize accros devices and platforms",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vigour-io/vigour-fs"
+  },
+  "scripts": {
+    "test": "./test/test.js"
+  },
+  "engines": {
+    "node": ">=0.4.0"
+  },
+  "keywords": [
+    "file",
+    "system",
+    "osx",
+    "android",
+    "windows-mobile"
+  ],
+  "author": "jim de beer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vigour-io/vigour-fs/issues"
+  },
+  "dependencies": {
+    "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
+    "graceful-fs": "~3.0.2"
+  },
+  "homepage": "https://github.com/vigour-io/vigour-fs"
+}
