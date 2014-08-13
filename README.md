@@ -71,7 +71,8 @@ fs.readFile('http://www.example.com/test.txt', { encoding: 'utf8' }, function(er
 
 ### fs.writeFile( *filename*, data, [options], *callback* )
 Write file
-Adds functionality to data can also be an url then it will try to write the file from the url
+
+Adds functionality to data, which can also be an url, making it try to write the file from the url
 
 Argument | Type | Default | Description
 ------ | ---- | ------- | -----------
