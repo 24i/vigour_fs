@@ -43,14 +43,27 @@ root directory of the filesystem
 
 ### fs.readFile( *filename*, [options], *callback* )
 Read files.
-Adds functionality to filename can also be an url then it will try to load the file from the url
 
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-filename | String or URL | |  Filename can also include path
-callback | function() | |  Callback
-options | String or Object | | Client only supports encoding no flag
+Adds functionality to filename so it can also be a url in which case it will try to load the file from that url, optionally retrying if request fails (see [available options](#user-content-readFile-available-options))
 
+Argument | Type | Description
+------ | ---- | -----------
+filename | String or URL |  Filename can also include path
+options | String or Object | Client only supports encoding no flag
+callback | Function | Called with `callback(error)` if the operation failed, or `callback(null, data, response)` if the operation succeeded, where *data* is the requested file and *response* is a full [http response object](http://nodejs.org/api/http.html#http_http_incomingmessage).
+
+<a name='readFile-available-options'></a>
+#### Available Options
+Option | Possible values | Default | Description
+---|---|---|---
+url | <ul><li>true</li><li>false</li></ul> | true | Whether to treat *path* as a url. If false, treats *path* as a local file path. Otherwise, treats *path* as a url if and only if it starts with `http://` or `https://`
+maxTries | Positive integer above 0 | 1 | Number of attempts to make in total (5 means one attempt and four retries)
+<a name='readFile-retryDelay'></a>retryDelay | Positive integer  | 500 | Time to wait before retrying the first time, in milliseconds. Subsequent attempts may use a different delay, dependant on the [`retryDelayType`](#user-content-readFile-retryDelayType) option. The delay may also be given by a 'retry-after' header accompanying a 503 response (see the [`respectRetryAfter`](#user-content-readFile-respectRetryAfter) option).
+<a name='readFile-retryDelayType'></a>retryDelayType | <ul><li>exp</li><li>linear</li><li>constant</li></ul> | 'exp' | Time to wait before retrying, in milliseconds, as a function of the attempt number (`tryNb`) and the original delay (`retryDelay`) specified in the [`retryDelay`](#user-content-readFile-retryDelay) option <dl><dt>exp</dt><dd>`retryDelay * 2 ^ tryNb`</dd><dt>linear</dt><dd>`retryDelay * tryNb`</dd><dt>*anything else*</dt><dd>`retryDelay`</dd></dl>
+<a name='readFile-respectRetryAfter'></a>respectRetryAfter | <ul><li>true</li><li>false</li></ul> | true | Whether to respect the delay provided in a `retry-after` header when receiving a 503 response. True will respect the received delay, false will ignore it and use the [`retryDelayType`](#user-content-readFile-retryDelayType) and [`retryDelay`](#user-content-readFile-retryDelay) options to determine the delay.
+retryOn404 | <ul><li>true</li><li>false</li></ul> | false | Whether to retry when response status code is 404. This looks stupid, and most of the time it will be. It is recommended to leave the default in for this one.
+
+#### Examples
 ```javascript
 fs.readFile('somefile.txt', function(err, data) {
   console.log(data, err)
@@ -64,15 +77,36 @@ fs.readFile('somefile.txt', { encoding: 'utf8' }, function(err, data) {
   console.log(data, err)
 })
 
-fs.readFile('http://www.example.com/test.txt', { encoding: 'utf8' }, function(err, data) {
-  console.log(data, err)
-})
+fs.readFile('http://www.example.com/test.txt'
+  , { encoding: 'utf8' }
+  , function(err, data) {
+    if (!err) {
+      console.log('response header', data.head)
+      console.log('response body', data.body)
+    }
+  })
+
+fs.readFile('http://www.example.com/test.txt'
+  , {
+    encoding: 'utf8'
+    , maxTries: 5
+    , retryDelayType: 'exp'
+    , retryDelay: 100
+    , retryOn404: true
+    , respectRetryAfter: true
+  }
+  , function(err, data) {
+    if (!err) {
+      console.log('response header', data.head)
+      console.log('response body', data.body)
+    }
+  })
 ```
 
 ### fs.writeFile( *filename*, data, [options], *callback* )
 Write file
 
-Adds functionality to data, which can also be an url, making it try to write the file from the url
+Adds functionality to data so it can also be a url in which case it will try to get the data from that url (excluding the header) and write it to the file. The header should be part of the err object if the operation fails.
 
 Argument | Type | Default | Description
 ------ | ---- | ------- | -----------
@@ -86,10 +120,19 @@ fs.writeFile('somefile.txt', 'data in a string', function(err) {
   if(!err) console.log('succes!')
 })
 
-//if you do not want urls to be parsed add an option url:false
 fs.writeFile('somefile.txt','http://www.google.com', function(err) {
   if(!err) console.log('succes!')
+  else console.log(err.head)
 })
+
+//if you do not want urls to be parsed add an option url:false
+fs.writeFile('somefile.txt'
+  ,'http://www.google.com'
+  , { url: false }
+  , function(err) {
+    if(!err) console.log('succes!')
+    else console.log(err.head)
+  })
 ```
 ### fs.readdir( *path*, *callback* )
 Reads directory returns an array

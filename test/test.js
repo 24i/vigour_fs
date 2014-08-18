@@ -9,7 +9,7 @@ fs.readFile(__dirname+'/files/pipe.jpg',function(err, data) {
   if(!err) log.info('done')
 })
 
-fs.readFile('http://www.google.com' , function(err, data) {
+fs.readFile('http://www.google.com' , function(err, data, response) {
   // log.info(data)
   if(err) { 
     log.error('ERROR! cannot get google', err) 
