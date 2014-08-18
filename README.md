@@ -50,18 +50,18 @@ Argument | Type | Description
 ------ | ---- | -----------
 filename | String or URL |  Filename can also include path
 options | String or Object | Client only supports encoding no flag
-callback | Function | Called with `callback(error)` if the operation failed, or `callback(null, data, response)` if the operation succeeded, where *data* is the requested file and *response* is a full [http response object](http://nodejs.org/api/http.html#http_http_incomingmessage).
+callback | Function | Called with `callback(error)` if the operation failed, or `callback(null, data, response)` if the operation succeeded (`response.statusCode` is one of `200`, `201`, `202`, `203`, `301`, `302`, `304`, `307`), where *data* is the requested file and *response* is a full [http response object](http://nodejs.org/api/http.html#http_http_incomingmessage).
 
 <a name='readFile-available-options'></a>
 #### Available Options
 Option | Possible values | Default | Description
 ---|---|---|---
-url | <ul><li>true</li><li>false</li></ul> | true | Whether to treat *path* as a url. If false, treats *path* as a local file path. Otherwise, treats *path* as a url if and only if it starts with `http://` or `https://`
-maxTries | Positive integer above 0 | 1 | Number of attempts to make in total (5 means one attempt and four retries)
-<a name='readFile-retryDelay'></a>retryDelay | Positive integer  | 500 | Time to wait before retrying the first time, in milliseconds. Subsequent attempts may use a different delay, dependant on the [`retryDelayType`](#user-content-readFile-retryDelayType) option. The delay may also be given by a 'retry-after' header accompanying a 503 response (see the [`respectRetryAfter`](#user-content-readFile-respectRetryAfter) option).
-<a name='readFile-retryDelayType'></a>retryDelayType | <ul><li>exp</li><li>linear</li><li>constant</li></ul> | 'exp' | Time to wait before retrying, in milliseconds, as a function of the attempt number (`tryNb`) and the original delay (`retryDelay`) specified in the [`retryDelay`](#user-content-readFile-retryDelay) option <dl><dt>exp</dt><dd>`retryDelay * 2 ^ tryNb`</dd><dt>linear</dt><dd>`retryDelay * tryNb`</dd><dt>*anything else*</dt><dd>`retryDelay`</dd></dl>
-<a name='readFile-respectRetryAfter'></a>respectRetryAfter | <ul><li>true</li><li>false</li></ul> | true | Whether to respect the delay provided in a `retry-after` header when receiving a 503 response. True will respect the received delay, false will ignore it and use the [`retryDelayType`](#user-content-readFile-retryDelayType) and [`retryDelay`](#user-content-readFile-retryDelay) options to determine the delay.
-retryOn404 | <ul><li>true</li><li>false</li></ul> | false | Whether to retry when response status code is 404. This looks stupid, and most of the time it will be. It is recommended to leave the default in for this one.
+url | <ul><li>`true`</li><li>`false`</li></ul> | `true` | Whether to treat *path* as a url. If false, treats *path* as a local file path. Otherwise, treats *path* as a url if and only if it starts with `http://` or `https://`
+maxTries | *Positive integer above 0* | `1` | Number of attempts to make in total. If over 1, will retry the request if the response's status code is 500 or 503. Use the [`retryOn404`](#user-content-readFile-retryOn404) option to retry on 404 as well (not recommended).
+<a name='readFile-retryDelay'></a>retryDelay | *Positive integer*  | `500` | Time to wait before retrying the first time, in milliseconds. Subsequent attempts may use a different delay, dependant on the [`retryDelayType`](#user-content-readFile-retryDelayType) option. The delay may also be given by a 'retry-after' header accompanying a 503 response (see the [`respectRetryAfter`](#user-content-readFile-respectRetryAfter) option).
+<a name='readFile-retryDelayType'></a>retryDelayType | <ul><li>`exp`</li><li>`linear`</li><li>`constant`</li></ul> | `exp` | Time to wait before retrying, in milliseconds, as a function of the attempt number (`tryNb`) and the original delay (`retryDelay`) specified in the [`retryDelay`](#user-content-readFile-retryDelay) option <dl><dt>exp</dt><dd>`retryDelay * 2 ^ tryNb`</dd><dt>linear</dt><dd>`retryDelay * tryNb`</dd><dt>*anything else*</dt><dd>`retryDelay`</dd></dl>
+<a name='readFile-respectRetryAfter'></a>respectRetryAfter | <ul><li>`true`</li><li>`false`</li></ul> | `true` | Whether to respect the delay provided in a `retry-after` header when receiving a 503 response. True will respect the received delay, false will ignore it and use the [`retryDelayType`](#user-content-readFile-retryDelayType) and [`retryDelay`](#user-content-readFile-retryDelay) options to determine the delay.
+<a name='readFile-retryOn404'></a>retryOn404 | <ul><li>`true`</li><li>`false`</li></ul> | `false` | Whether to retry when response status code is 404. This looks stupid, and most of the time it will be. It is recommended to leave the default in for this one.
 
 #### Examples
 ```javascript
