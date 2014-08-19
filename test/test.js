@@ -103,6 +103,50 @@ function finishManyGets (err, data) {
 
 // ---
 
+function createDate (timestamp) {
+  var dayNames = [
+      'Sun'
+      , 'Mon'
+      , 'Tue'
+      , 'Wed'
+      , 'Thu'
+      , 'Fri'
+      , 'Sat']
+    , monthNames = [
+      'Jan'
+      , 'Feb'
+      , 'Mar'
+      , 'Apr'
+      , 'May'
+      , 'Jun'
+      , 'Jul'
+      , 'Aug'
+      , 'Sep'
+      , 'Oct'
+      , 'Nov'
+      , 'Dec'
+    ]
+    , date = new Date(timestamp)
+    , pad = function (nb) {
+      return (nb < 10) ? "0" + nb : nb
+    }
+  return dayNames[date.getUTCDay()]
+    + ", "
+    + date.getUTCDate()
+    + " "
+    + monthNames[date.getUTCMonth()]
+    + " "
+    + date.getUTCFullYear()
+    + " "
+    + pad(date.getUTCHours())
+    + ":"
+    + pad(date.getUTCMinutes())
+    + ":"
+    + pad(date.getUTCSeconds())
+    + " "
+    + "GMT"
+}
+
 function middleFactory (retryVar, name) {
   return function middle (req, res, next) {
     if (retryVar === 0) {
@@ -124,8 +168,9 @@ function middleFactory (retryVar, name) {
       res.status(503).end()
     } else if (retryVar === 4) {
       retryVar += 1
-      // log.info(name + ' responding with 500')
-      res.status(500).end()
+      // log.info(name + ' responding with 503 (HTTP-date in 0.5 seconds)')
+      res.setHeader('Retry-After', createDate(Date.now() + 500))
+      res.status(503).end()
     } else if (retryVar === 5) {
       retryVar += 1
       // log.info(name + ' responding with 503 (HTTP-date in the past)')
@@ -166,7 +211,7 @@ fs.readFile('http://localhost:' + readPort, {
     , retryDelay: 100
     , retryOn404: true
     , respectRetryAfter: true
-    , maxRetryDelay: 500
+    , maxRetryDelay: 1000
   }
   , function (err, data, response) {
     if (err) {
@@ -189,7 +234,7 @@ fs.writeFile(__dirname + '/files/out2.txt', 'http://localhost:' + writePort, {
     , retryDelay: 100
     , retryOn404: true
     , respectRetryAfter: true
-    , maxRetryDelay: 500
+    , maxRetryDelay: 1000
   }
   , function (err) {
     if (err) {
