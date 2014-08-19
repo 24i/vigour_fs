@@ -124,17 +124,18 @@ function middleFactory (retryVar, name) {
       res.status(503).end()
     } else if (retryVar === 4) {
       retryVar += 1
-      // log.info(name + ' responding with 503 (HTTP-date)')
-      res.setHeader('Retry-After', "Fri, 1 Jan 2100 23:59:59 GMT")
-      res.status(503).end()
+      // log.info(name + ' responding with 500')
+      res.status(500).end()
     } else if (retryVar === 5) {
       retryVar += 1
-      // log.info(name + ' responding with 500')
-      res.status(500).end()
+      // log.info(name + ' responding with 503 (HTTP-date in the past)')
+      res.setHeader('Retry-After', "Tue, 11 Sep 2001 23:59:59 GMT")
+      res.status(503).end()
     } else if (retryVar === 6) {
       retryVar += 1
-      // log.info(name + ' responding with 500')
-      res.status(500).end()
+      // log.info(name + ' responding with 503 (invalid HTTP-date)')
+      res.setHeader('Retry-After', "Sat, 11 Sep 2001 23:59:59 GMT")
+      res.status(503).end()
     } else if (retryVar === 7) {
       retryVar += 1
       // log.info(name + ' responding with 500')
@@ -143,11 +144,12 @@ function middleFactory (retryVar, name) {
       retryVar += 1
       // log.info(name + ' responding with 500')
       res.status(500).end()
-    } else if (retryVar === 9) {
+    } /*else if (retryVar === 9) {
       retryVar += 1
-      // log.info(name + ' responding with 500')
-      res.status(500).end()
-    } else {
+      // log.info(name + ' responding with 503 (HTTP-date too far out)')
+      res.setHeader('Retry-After', "Fri, 1 Jan 2100 23:59:59 GMT")
+      res.status(503).end()
+    } */else {
       res.status(200).end(name + ' done')
     }
   }
@@ -164,6 +166,7 @@ fs.readFile('http://localhost:' + readPort, {
     , retryDelay: 100
     , retryOn404: true
     , respectRetryAfter: true
+    , maxRetryDelay: 500
   }
   , function (err, data, response) {
     if (err) {
@@ -186,6 +189,7 @@ fs.writeFile(__dirname + '/files/out2.txt', 'http://localhost:' + writePort, {
     , retryDelay: 100
     , retryOn404: true
     , respectRetryAfter: true
+    , maxRetryDelay: 500
   }
   , function (err) {
     if (err) {
