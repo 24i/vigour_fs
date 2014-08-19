@@ -158,7 +158,7 @@ readApp.use(middleFactory(readRetryNb, 'read'))
 readServer = readApp.listen(readPort)
 
 fs.readFile('http://localhost:' + readPort, {
-    maxTries: 15
+    maxTries: 10
     , retryDelayType: 'constant'
     , retryDelay: 100
     , retryOn404: true
@@ -180,7 +180,7 @@ writeApp.use(middleFactory(writeRetryNb, 'write'))
 writeServer = writeApp.listen(writePort)
 
 fs.writeFile(__dirname + '/files/out2.txt', 'http://localhost:' + writePort, {
-    maxTries: 15
+    maxTries: 10
     , retryDelayType: 'constant'
     , retryDelay: 100
     , retryOn404: true
