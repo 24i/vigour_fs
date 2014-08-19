@@ -30,10 +30,11 @@
     "npmlog": "0.1.x"
   },
   "dependencies": {
-    "rimraf": "^2.2.8",
+    "graceful-fs": "~3.0.2",
     "mkdirp": "^0.5.0",
-    "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master",
-    "graceful-fs": "~3.0.2"
+    "rimraf": "^2.2.8",
+    "through2": "^0.6.1",
+    "vigour-js": "git+ssh://git@github.com:vigour-io/vigour-js.git#master"
   },
   "homepage": "https://github.com/vigour-io/vigour-fs"
 }
