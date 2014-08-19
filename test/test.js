@@ -124,8 +124,9 @@ function middleFactory (retryVar, name) {
       res.status(503).end()
     } else if (retryVar === 4) {
       retryVar += 1
-      // log.info(name + ' responding with 500')
-      res.status(500).end()
+      // log.info(name + ' responding with 503 (HTTP-date)')
+      res.setHeader('Retry-After', "Fri, 1 Jan 2100 23:59:59 GMT")
+      res.status(503).end()
     } else if (retryVar === 5) {
       retryVar += 1
       // log.info(name + ' responding with 500')
