@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-var fs = require('../')
+var fs = require('../../')
   , log = require('npmlog')
-  , testServer = require('./testServer.js')
+  , testServer = require('../testServer.js')
   , readServer
   , writeServer
   , readPort = 8000
@@ -14,6 +14,7 @@ var fs = require('../')
     , respectRetryAfter: true
     , maxRetryDelay: 1000
   }
+  , filesPath = __dirname + '/files/'
   , l
   , i
   , fails
@@ -23,7 +24,7 @@ log.warn("This script doesn't test the client side version. See tests/client")
 
 // ---
 
-fs.readFile(__dirname + '/files/data.txt', function (err, data) {
+fs.readFile(filesPath + 'data.txt', function (err, data) {
   if (err) {
     log.error('testing read file', 'Fail ', err)
   } else {
@@ -43,7 +44,7 @@ fs.readFile('http://perdu.com', function (err, data, response) {
 
 // ---
 
-fs.writeFile(__dirname + '/files/out.txt', "File writer's block", function (err) {
+fs.writeFile(filesPath + 'out.txt', "File writer's block", function (err) {
   if (err) {
     log.error('testing write file', 'Fail ', err)
   } else {
@@ -53,7 +54,7 @@ fs.writeFile(__dirname + '/files/out.txt', "File writer's block", function (err)
 
 // ---
 
-fs.writeFile(__dirname + '/files/out1.txt', 'http://perdu.com', function (err) {
+fs.writeFile(filesPath + 'out1.txt', 'http://perdu.com', function (err) {
   if (err) {
     log.error('testing write url', 'Fail ', err)
   } else {
@@ -63,7 +64,7 @@ fs.writeFile(__dirname + '/files/out1.txt', 'http://perdu.com', function (err) {
 
 // ---
 
-fs.mkdirp(__dirname + '/files/yuz/yub/yubbie', function (err) {
+fs.mkdirp(filesPath + 'yuz/yub/yubbie', function (err) {
   if (err) {
     log.error('testing mkdirp', 'Fail ', err)
   } else {
@@ -122,7 +123,7 @@ fs.readFile('http://localhost:' + readPort
 // ---
 
 writeServer = testServer('write', writePort)
-fs.writeFile(__dirname + '/files/out2.txt', 'http://localhost:' + writePort
+fs.writeFile(filesPath + 'out2.txt', 'http://localhost:' + writePort
   , retryOptions
   , function (err) {
     if (err) {

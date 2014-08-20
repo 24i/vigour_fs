@@ -4,7 +4,7 @@
   "description": "fs used to generilize accros devices and platforms",
   "main": "index.js",
   "scripts": {
-    "test": "./test/test.js"
+    "test": "./test/server/test.js"
   },
   "repository": {
     "type": "git",
