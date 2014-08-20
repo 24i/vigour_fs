@@ -20,7 +20,7 @@ var fs = require('../../')
   , fails
   , nbLeft
 
-log.warn("This script doesn't test the client side version. See tests/client")
+log.warn("This script doesn't test the client side version. See tests/client/README.md")
 
 // ---
 

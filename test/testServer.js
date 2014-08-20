@@ -107,7 +107,8 @@ module.exports = exports = function (name, port) {
 
   app.use(middleFactory(retryNb, name))
 
-  return app.listen(port)
+  console.log(name + ' server listening on port ' + _port)
+  return app.listen(_port)
 }
 
 
