@@ -13,6 +13,8 @@ Testing vigour-fs on devices
     + `cordova create native io.vigour.vigourFsNativeTest VigourFsNativeTest`
 - Go into the created directory
     + `cd native`
+- Add the following line to `config.xml`, just before `</widget>`
+    + `<preference name="setAllowUniversalAccessFromFileURLs" value="true" />`
 - Add the file and file transfer plugins
     + `cordova plugin add org.apache.cordova.file`
     + `cordova plugin add org.apache.cordova.file-transfer`

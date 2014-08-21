@@ -103,6 +103,8 @@ function finishManyGets (err, data) {
     } else {
       log.info('testing many subsequent GET requests', 'Pass', data/*.toString()*/)
     }
+  } else if (err) {
+    log.error('testing many subsequent GET requests', 'Fail', err)
   }
 }
 

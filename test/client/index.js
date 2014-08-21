@@ -14,9 +14,12 @@ try {
 
     var fs = require('../../')
         , filePath = 'out.txt'
+        , nonFilePath = 'nothingHere.txt'
         , fileContents = "File writer's block"
         , url = "https://api.themoviedb.org/3/search/movie?api_key=1858b4fe727192fef95bf123deab5353&query=Mud"
         , downloadTarget = 'out2.txt'
+        , nonDirPathRoot = 'i'
+        , nonDirPath = '/dont/exists'
 
 
     fs.writeFile(filePath, fileContents, function (err) {
@@ -51,9 +54,9 @@ try {
             }
         })
 
-    fs.readFile(url, function (err, data, response) {
+    fs.readFile(url, function (err, data) {
       if (err) {
-        notify('FAIL', 'testing read url', err)
+        notify('FAIL', 'testing read url', JSON.stringify(err))
       } else {
         notify('PASS', 'testing read url', JSON.stringify(data))
       }
@@ -67,7 +70,7 @@ try {
         }
     })
 
-    fs.exists('nothingHere.txt', function (exists) {
+    fs.exists(nonFilePath, function (exists) {
         if (exists) {
             notify('FAIL', 'testing exists on inexistant file')
         } else {
@@ -75,11 +78,33 @@ try {
         }
     })
 
-    fs.mkdirp('i/dont/exists', function (err) {
+    fs.mkdirp(nonDirPathRoot + nonDirPath, function (err) {
         if (err) {
             notify('FAIL', 'testing mkdirp')
         } else {
             notify('PASS', 'testing mkdirp')
+            fs.remove(nonDirPathRoot, function (err) {
+                if (err) {
+                    notify('FAIL', 'testing remove on existing directory', JSON.stringify(err))
+                } else {
+                    notify('PASS', 'testing remove on existing directory')
+                    fs.exists(nonDirPathRoot + nonDirPath, function (exists) {
+                        if (exists) {
+                            notify('FAIL', 'either exists is broken, or remove on existing directory fails')
+                        } else {
+                            notify('PASS', 'Existing directory indeed removed')
+                        }
+                    })
+                }
+            })
+        }
+    })
+
+    fs.remove('asdfgssadsfdhsd', function (err) {
+        if (err) {
+            notify('FAIL', 'testing remove on inexistent directory', JSON.stringify(err))
+        } else {
+            notify('PASS', 'testing remove on inexistent directory')
         }
     })
 } catch (e) {
