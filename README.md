@@ -41,7 +41,7 @@ fs.writeFile('somefile.txt', 'some data', function(err) {
 ### fs.rootDir
 root directory of the filesystem
 
-### fs.readFile( *filename*, [options], *callback* )
+### fs.readFile(*filename*, [options], *callback*)
 Read files.
 
 Adds functionality to filename so it can also be a url in which case it will try to load the file from that url, optionally retrying if request fails (see [available options](#user-content-readFile-available-options))
@@ -50,7 +50,7 @@ Argument | Type | Description
 ------ | ---- | -----------
 filename | String or URL |  Filename can also include path
 options | String or Object | Client only supports encoding no flag
-callback | Function | Called with `callback(error)` if the operation failed, or `callback(null, data, response)` if the operation succeeded (`response.statusCode` is one of `200`, `201`, `202`, `203`, `301`, `302`, `304`, `307`), where *data* is the requested file and *response* is a full [http response object](http://nodejs.org/api/http.html#http_http_incomingmessage).
+callback | Function | Called with `callback(error)` if the operation failed, or `callback(null, data, response)` if the operation succeeded (`response.statusCode` is `200`), where *data* is the requested file and *response* is a full [http response object](http://nodejs.org/api/http.html#http_http_incomingmessage).
 
 <a name='readFile-available-options'></a>
 #### Available Options
@@ -103,17 +103,21 @@ fs.readFile('http://www.example.com/test.txt'
   })
 ```
 
-### fs.writeFile( *filename*, data, [options], *callback* )
+### fs.writeFile(*filename*, data, [options], *callback*)
 Write file
 
-Adds functionality to data so it can also be a url in which case it will try to get the data from that url (excluding the header) and write it to the file. The header should be part of the err object if the operation fails.
+Adds functionality to data so it can also be a url in which case it will try to get the data from that url (excluding the header) and write it to the file. On node, *writeFile* can be configured to retry if request fails by passing in the appropriate options (see [`fs.readFile` options](#user-content-readFile-available-options)). On native devices, no retries are made, no matter what the options are.
 
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-filename | String | |  Filename can also include path
-data | String or Buffer or URL | | Buffer can create difficulties on certain clients
-callback | function() | |  Callback
-options | String or Object | | Client supports encoding and mode if possible. Adds url default on true
+Argument | Type | Description
+--- | --- | ---
+filename | String | Filename can also include path
+data | String or Buffer or URL | Buffer can create difficulties on certain clients, use with caution.
+callback | Function | Called with `callback(error)` if the operation failed, or `callback(null)` if the operation succeeded.
+
+#### Available options
+Same as [`fs.readFile` options](#user-content-readFile-available-options)
+
+#### Examples
 
 ```javascript
 fs.writeFile('somefile.txt', 'data in a string', function(err) {
@@ -122,7 +126,7 @@ fs.writeFile('somefile.txt', 'data in a string', function(err) {
 
 fs.writeFile('somefile.txt','http://www.google.com', function(err) {
   if(!err) console.log('succes!')
-  else console.log(err.head)
+  else console.log(err)
 })
 
 //if you do not want urls to be parsed add an option url:false
@@ -131,7 +135,7 @@ fs.writeFile('somefile.txt'
   , { url: false }
   , function(err) {
     if(!err) console.log('succes!')
-    else console.log(err.head)
+    else console.log(err)
   })
 ```
 ### fs.readdir( *path*, *callback* )
@@ -205,10 +209,10 @@ fs.rename('bla/somefile.txt', function(err) {
 ### fs.exists( *path*, *callback* )
 Check if a file or folder exists
 
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-path | String | |  path
-callback | function() | |  Callback
+Argument | Type | Description
+------ | ---- | -----------
+path | String | path
+callback | Function | Called with `callback(exists)` where *exists* is `true` if the file exists, `false` otherwise
 
 ```javascript
 fs.exists('bla/somefolder', function(exists) {
