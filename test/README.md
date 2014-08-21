@@ -29,3 +29,6 @@ Testing vigour-fs on devices
 - Make sure USB debugging is enabled
 - Launch the test on that device
     + `cordova run <platform_name> --device`
+
+## Tips
+- When using `try { } catch (e) { ... }`, e.stack is helpful on Android. It is not helpful on iOS. If this is your debugging method of choice, test with Android first.
