@@ -58,6 +58,30 @@ try {
         notify('PASS', 'testing read url', JSON.stringify(data))
       }
     })
+
+    fs.exists(filePath, function (exists) {
+        if (exists) {
+            notify('PASS', 'testing exists on existing file')
+        } else {
+            notify('FAIL', 'testing exists on existing file', 'pass if write file failed')
+        }
+    })
+
+    fs.exists('nothingHere.txt', function (exists) {
+        if (exists) {
+            notify('FAIL', 'testing exists on inexistant file')
+        } else {
+            notify('PASS', 'testing exists on inexistant file')
+        }
+    })
+
+    fs.mkdirp('i/dont/exists', function (err) {
+        if (err) {
+            notify('FAIL', 'testing mkdirp')
+        } else {
+            notify('PASS', 'testing mkdirp')
+        }
+    })
 } catch (e) {
     notify("Exception", e.stack)
 }
