@@ -44,11 +44,18 @@ try {
                 notify('FAIL', 'testing write url', JSON.stringify(err))
             } else {
                 notify('PASS', 'testing write url')
-                fs.readFile(downloadTarget, function (err, data) {
+                fs.rename(downloadTarget, 'renamed.txt', function (err) {
                     if (err) {
-                        notify('FAIL', 'read downloaded', JSON.stringify(err))
+                        notify('FAIL', 'testing file rename', JSON.stringify(err))
                     } else {
-                        notify('PASS', 'read downloaded', data)
+                        notify('PASS', 'testing file rename')
+                        fs.readFile('renamed.txt', function (err, data) {
+                            if (err) {
+                                notify('FAIL', 'read downloaded', JSON.stringify(err))
+                            } else {
+                                notify('PASS', 'read downloaded'/*, data*/)
+                            }
+                        })
                     }
                 })
             }
@@ -58,7 +65,7 @@ try {
       if (err) {
         notify('FAIL', 'testing read url', JSON.stringify(err))
       } else {
-        notify('PASS', 'testing read url', JSON.stringify(data))
+        notify('PASS', 'testing read url'/*, JSON.stringify(data)*/)
       }
     })
 
@@ -83,16 +90,23 @@ try {
             notify('FAIL', 'testing mkdirp')
         } else {
             notify('PASS', 'testing mkdirp')
-            fs.remove(nonDirPathRoot, function (err) {
+            fs.rename(nonDirPathRoot, 'renamedDir', function (err) {
                 if (err) {
-                    notify('FAIL', 'testing remove on existing directory', JSON.stringify(err))
+                    notify('FAIL', 'testing rename on a directory', JSON.stringify(err))
                 } else {
-                    notify('PASS', 'testing remove on existing directory')
-                    fs.exists(nonDirPathRoot + nonDirPath, function (exists) {
-                        if (exists) {
-                            notify('FAIL', 'either exists is broken, or remove on existing directory fails')
+                    notify('PASS', 'testing rename on a directory')
+                    fs.remove('renamedDir', function (err) {
+                        if (err) {
+                            notify('FAIL', 'testing remove on existing directory', JSON.stringify(err))
                         } else {
-                            notify('PASS', 'Existing directory indeed removed')
+                            notify('PASS', 'testing remove on existing directory')
+                            fs.exists(nonDirPathRoot + nonDirPath, function (exists) {
+                                if (exists) {
+                                    notify('FAIL', 'either exists is broken, or remove on existing directory fails, or rename on directory fails')
+                                } else {
+                                    notify('PASS', 'Existing directory indeed removed')
+                                }
+                            })
                         }
                     })
                 }
