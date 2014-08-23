@@ -1,9 +1,8 @@
 try {
-    var nativeUtil = require('../../lib/nativeUtil')
-
+    var cordova = require('vigour-js/browser/cordova')
     function notify () {
         var args = arguments
-        nativeUtil.whenCordovaReady(function () {
+        cordova.whenReady(function () {
             p = document.createElement('p')
             p.appendChild(
                 document.createTextNode([].slice.call(args).join(': '))
@@ -21,19 +20,18 @@ try {
         , nonDirPathRoot = 'i'
         , nonDirPath = '/dont/exists'
 
-
     fs.writeFile(filePath, fileContents, function (err) {
         if (err) {
-        notify('FAIL', 'write file', JSON.stringify(err))
+            notify('FAIL', 'write file', JSON.stringify(err))
         } else {
-        notify('PASS', 'write file')
-        fs.readFile(filePath, function (err, data) {
-            if (err) {
-                notify('FAIL', 'read file', JSON.stringify(err))
-            } else {
-                notify('PASS', 'read file', JSON.stringify(data))
-            }
-        })
+            notify('PASS', 'write file')
+            fs.readFile(filePath, function (err, data) {
+                if (err) {
+                    notify('FAIL', 'read file', JSON.stringify(err))
+                } else {
+                    notify('PASS', 'read file', JSON.stringify(data))
+                }
+            })
         }
     })
 
@@ -122,5 +120,5 @@ try {
         }
     })
 } catch (e) {
-    notify("Exception", e.stack)
+    alert(e)
 }
