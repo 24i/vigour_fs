@@ -47,6 +47,13 @@ try {
                         notify('FAIL', 'testing file rename', JSON.stringify(err))
                     } else {
                         notify('PASS', 'testing file rename')
+                        fs.getURL('renamed.txt', function (err, url) {
+                            if (err) {
+                                notify('FAIL', 'testing getURL', JSON.stringify(err))
+                            } else {
+                                notify('PASS', 'testing getURL', url)
+                            }
+                        })
                         fs.readFile('renamed.txt', function (err, data) {
                             if (err) {
                                 notify('FAIL', 'read downloaded', JSON.stringify(err))
