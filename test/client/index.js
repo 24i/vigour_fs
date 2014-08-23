@@ -112,6 +112,42 @@ try {
         }
     })
 
+    fs.mkdirp('replaceSrc', function (err) {
+        if (err) {
+            notify('1. FAIL', JSON.stringify(err))
+        } else {
+            notify('1. PASS')
+            fs.writeFile('replaceSrc/file.txt', "T'entends?", function (err) {
+                if (err) {
+                    notify('2. FAIL', JSON.stringify(err))
+                } else {
+                    notify('2. PASS')
+                    fs.remove('replaceDest', function (err) {
+                        if (err) {
+                            notify('3. FAIL', JSON.stringify(err))
+                        } else {
+                            notify('3. PASS')
+                            fs.rename('replaceSrc', 'replaceDest', function (err) {
+                                if (err) {
+                                    notify('4. FAIL', JSON.stringify(err))
+                                } else {
+                                    notify('4. PASS')
+                                    fs.readFile('replaceDest/file.txt', function (err, data) {
+                                        if (err) {
+                                            notify('5. FAIL', JSON.stringify(err))
+                                        } else {
+                                            notify('5. PASS', data)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        }
+    })
+
     fs.remove('asdfgssadsfdhsd', function (err) {
         if (err) {
             notify('FAIL', 'testing remove on inexistent directory', JSON.stringify(err))
