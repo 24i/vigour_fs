@@ -25,11 +25,18 @@ try {
             notify('FAIL', 'write file', JSON.stringify(err))
         } else {
             notify('PASS', 'write file')
-            fs.readFile(filePath, function (err, data) {
+            fs.copy(filePath, 'copied.txt', function (err) {
                 if (err) {
-                    notify('FAIL', 'read file', JSON.stringify(err))
+                    notify('FAIL', 'copy file', JSON.stringify(err))
                 } else {
-                    notify('PASS', 'read file', JSON.stringify(data))
+                    notify('PASS', 'copy file')
+                    fs.readFile('copied.txt', function (err, data) {
+                        if (err) {
+                            notify('FAIL', 'read file', JSON.stringify(err))
+                        } else {
+                            notify('PASS', 'read file', JSON.stringify(data))
+                        }
+                    })
                 }
             })
         }
@@ -39,19 +46,19 @@ try {
         , url
         , function (err) {
             if (err) {
-                notify('FAIL', 'testing write url', JSON.stringify(err))
+                notify('FAIL', 'write url', JSON.stringify(err))
             } else {
-                notify('PASS', 'testing write url')
+                notify('PASS', 'write url')
                 fs.rename(downloadTarget, 'renamed.txt', function (err) {
                     if (err) {
-                        notify('FAIL', 'testing file rename', JSON.stringify(err))
+                        notify('FAIL', 'file rename', JSON.stringify(err))
                     } else {
-                        notify('PASS', 'testing file rename')
+                        notify('PASS', 'file rename')
                         fs.getURL('renamed.txt', function (err, url) {
                             if (err) {
-                                notify('FAIL', 'testing getURL', JSON.stringify(err))
+                                notify('FAIL', 'getURL', JSON.stringify(err))
                             } else {
-                                notify('PASS', 'testing getURL', url)
+                                notify('PASS', 'getURL', url)
                             }
                         })
                         fs.readFile('renamed.txt', function (err, data) {
@@ -68,43 +75,43 @@ try {
 
     fs.readFile(url, function (err, data) {
       if (err) {
-        notify('FAIL', 'testing read url', JSON.stringify(err))
+        notify('FAIL', 'read url', JSON.stringify(err))
       } else {
-        notify('PASS', 'testing read url'/*, JSON.stringify(data)*/)
+        notify('PASS', 'read url'/*, JSON.stringify(data)*/)
       }
     })
 
     fs.exists(filePath, function (exists) {
         if (exists) {
-            notify('PASS', 'testing exists on existing file')
+            notify('PASS', 'exists on existing file')
         } else {
-            notify('FAIL', 'testing exists on existing file', 'pass if write file failed')
+            notify('FAIL', 'exists on existing file', 'pass if write file failed')
         }
     })
 
     fs.exists(nonFilePath, function (exists) {
         if (exists) {
-            notify('FAIL', 'testing exists on inexistant file')
+            notify('FAIL', 'exists on inexistant file')
         } else {
-            notify('PASS', 'testing exists on inexistant file')
+            notify('PASS', 'exists on inexistant file')
         }
     })
 
     fs.mkdirp(nonDirPathRoot + nonDirPath, function (err) {
         if (err) {
-            notify('FAIL', 'testing mkdirp')
+            notify('FAIL', 'mkdirp')
         } else {
-            notify('PASS', 'testing mkdirp')
+            notify('PASS', 'mkdirp')
             fs.rename(nonDirPathRoot, 'renamedDir', function (err) {
                 if (err) {
-                    notify('FAIL', 'testing rename on a directory', JSON.stringify(err))
+                    notify('FAIL', 'rename on a directory', JSON.stringify(err))
                 } else {
-                    notify('PASS', 'testing rename on a directory')
+                    notify('PASS', 'rename on a directory')
                     fs.remove('renamedDir', function (err) {
                         if (err) {
-                            notify('FAIL', 'testing remove on existing directory', JSON.stringify(err))
+                            notify('FAIL', 'remove on existing directory', JSON.stringify(err))
                         } else {
-                            notify('PASS', 'testing remove on existing directory')
+                            notify('PASS', 'remove on existing directory')
                             fs.exists(nonDirPathRoot + nonDirPath, function (exists) {
                                 if (exists) {
                                     notify('FAIL', 'either exists is broken, or remove on existing directory fails, or rename on directory fails')
@@ -144,6 +151,22 @@ try {
                                             notify('5. FAIL', JSON.stringify(err))
                                         } else {
                                             notify('5. PASS', data)
+                                            fs.copy('replaceDest/file.txt'
+                                                , 'replaceDest/copy.txt'
+                                                , function (err) {
+                                                    if (err) {
+                                                        notify('6. FAIL', JSON.stringify(err))
+                                                    } else {
+                                                        notify('6. PASS')
+                                                        fs.readFile('replaceDest/copy.txt', function (err, data) {
+                                                            if (err) {
+                                                                notify('7. FAIL', JSON.stringify(err))
+                                                            } else {
+                                                                notify('7. PASS', data)
+                                                            }
+                                                        })
+                                                    }
+                                                })
                                         }
                                     })
                                 }
@@ -157,9 +180,9 @@ try {
 
     fs.remove('asdfgssadsfdhsd', function (err) {
         if (err) {
-            notify('FAIL', 'testing remove on inexistent directory', JSON.stringify(err))
+            notify('FAIL', 'remove on inexistent directory', JSON.stringify(err))
         } else {
-            notify('PASS', 'testing remove on inexistent directory')
+            notify('PASS', 'remove on inexistent directory')
         }
     })
 } catch (e) {
