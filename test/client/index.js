@@ -20,6 +20,14 @@ try {
         , nonDirPathRoot = 'i'
         , nonDirPath = '/dont/exists'
 
+    fs.getRoot(function (err, root) {
+        if (err) {
+            notify('FAIL', 'get root', JSON.stringify(err))
+        } else {
+            notify('PASS', 'get root', root)
+        }
+    })
+    
     fs.writeFile(filePath, fileContents, function (err) {
         if (err) {
             notify('FAIL', 'write file', JSON.stringify(err))
