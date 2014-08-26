@@ -27,7 +27,7 @@ try {
             notify('PASS', 'get root', root)
         }
     })
-    
+
     fs.writeFile(filePath, fileContents, function (err) {
         if (err) {
             notify('FAIL', 'write file', JSON.stringify(err))
@@ -110,21 +110,28 @@ try {
             notify('FAIL', 'mkdirp')
         } else {
             notify('PASS', 'mkdirp')
-            fs.rename(nonDirPathRoot, 'renamedDir', function (err) {
+            fs.readdir(nonDirPathRoot, function (err, files) {
                 if (err) {
-                    notify('FAIL', 'rename on a directory', JSON.stringify(err))
+                    notify('FAIL', 'readdir', JSON.stringify(err))
                 } else {
-                    notify('PASS', 'rename on a directory')
-                    fs.remove('renamedDir', function (err) {
+                    notify('PASS', 'readdir', JSON.stringify(files))
+                    fs.rename(nonDirPathRoot, 'renamedDir', function (err) {
                         if (err) {
-                            notify('FAIL', 'remove on existing directory', JSON.stringify(err))
+                            notify('FAIL', 'rename on a directory', JSON.stringify(err))
                         } else {
-                            notify('PASS', 'remove on existing directory')
-                            fs.exists(nonDirPathRoot + nonDirPath, function (exists) {
-                                if (exists) {
-                                    notify('FAIL', 'either exists is broken, or remove on existing directory fails, or rename on directory fails')
+                            notify('PASS', 'rename on a directory')
+                            fs.remove('renamedDir', function (err) {
+                                if (err) {
+                                    notify('FAIL', 'remove on existing directory', JSON.stringify(err))
                                 } else {
-                                    notify('PASS', 'Existing directory indeed removed')
+                                    notify('PASS', 'remove on existing directory')
+                                    fs.exists(nonDirPathRoot + nonDirPath, function (exists) {
+                                        if (exists) {
+                                            notify('FAIL', 'either exists is broken, or remove on existing directory fails, or rename on directory fails')
+                                        } else {
+                                            notify('PASS', 'Existing directory indeed removed')
+                                        }
+                                    })
                                 }
                             })
                         }
