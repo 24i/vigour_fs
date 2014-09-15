@@ -3,8 +3,8 @@ var fs = require('../../../')
   , log = require('npmlog')
 
 fs.walk(
-  __dirname+'/files'
-, { exclude:[ /\.js$/, 'c2', /^\./ ] 
+  '../'
+, { exclude:[ /\.js$/, /^\./ ] 
   , method:function(path, field, files, obj, current) {
       // console.log(path, field, files, obj, current)
     }
