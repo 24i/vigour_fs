@@ -5,7 +5,7 @@ var fs = require('../../../')
 fs.walk(
   __dirname+'/files'
 , { exclude:[ /\.js$/, 'c2' ] 
-  , method:function(path, isDir) {
+  , method:function(path, field, files, obj) {
       console.log()
     }
   }
