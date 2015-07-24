@@ -4,3 +4,4 @@ node_modules
 .*.sw[op]
 *.mp4
 test/client/native
+test/server/files/out*
