@@ -34,28 +34,45 @@ server = app.listen(port, function () {
 	fs.readFile("http://localhost:8999/path", function (err, data) {
 		if (err) {
 			console.error("FAIL", err)
+			end()
 		} else {
 			console.log(data.toString())
 			console.log("Testing url")
 			fs.readFile("http://localhost:8999/url", function (err, data) {
 				if (err) {
 					console.error("FAIL", err)
+					end()
 				} else {
 					console.log(data.toString())
 					console.log("Testing deep path")
 					fs.readFile("http://localhost:8999/way/deeper/path", function (err, data) {
 						if (err) {
 							console.error("FAIL", err)
+							end()
 						} else {
 							console.log(data.toString())
 							console.log("Testing deep url")
 							fs.readFile("http://localhost:8999/way/deeper/url", function (err, data) {
 								if (err) {
 									console.error("FAIL", err)
+									end()
 								} else {
 									console.log(data.toString())
-									console.log("ALL DONE")
-									server.close()
+									console.log("Testing `followRedirects: false`")
+									fs.readFile("http://localhost:8999/path", { followRedirects: false }, function (err, data) {
+										if (err) {
+											if (err.statusCode === 301) {
+												console.log("SUCCESS")
+												console.log("ALL DONE")
+											} else {
+												console.error("FAIL", err)
+											}
+										} else {
+											console.log(data.toString())
+											console.error("FAIL", "Should not have followed redirect")
+										}
+										end()
+									})
 								}
 							})
 						}
@@ -66,3 +83,6 @@ server = app.listen(port, function () {
 	})
 })
 
+function end () {
+	server.close()
+}
