@@ -1,6 +1,6 @@
 {
   "name": "vigour-fs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "fs used to generilize accros devices and platforms",
   "main": "index.js",
   "scripts": {
