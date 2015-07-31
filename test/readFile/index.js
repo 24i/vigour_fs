@@ -36,6 +36,15 @@ describe('fs.readFile', function () {
 		  })
 		})
 	})
+
+	it("should fail on inexistant files", function (done) {
+		var filename = path.join(__dirname, 'does_not_exist.txt')
+		fs.readFile(filename, function (err, data) {
+			expect(err.code).to.equal("ENOENT")
+			expect(data).not.to.exist
+			done()
+		})
+	})
 	  
 	process.on('uncaughtException', function (err) {
 	  it('should not throw uncaughtException', function () {
