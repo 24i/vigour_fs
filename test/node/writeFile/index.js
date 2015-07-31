@@ -1,5 +1,3 @@
-var chai = require('chai') // TODO Remove this when gaston allows it
-var expect = chai.expect	// TODO Remove this when gaston allows it
 var path = require('path')
 
 var fs = require('../../../lib/server')
