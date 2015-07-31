@@ -8,14 +8,14 @@ var tooBig = 1024 * 1024 * 1024
 var bigButFine = tooBig - 1
 
 describe('fs.readFile', function () {
-	it("should fail with err.code === 'EISDIR' on directories", function (done) {
+	it("should fail with `err.code === 'EISDIR'` on directories", function (done) {
 		fs.readFile('/', { encoding: 'utf8' }, function (err, data) {
 			expect(err.code).to.equal('EISDIR')
 			done()
 		})
 	})
 
-	it("should fail with err.name === 'RangeError' on files of (1024*1024*1024) bytes or more", function (done) {
+	it("should fail with `err.name === 'RangeError'` on files of (1024*1024*1024) bytes or more", function (done) {
 		this.timeout(10000)
 		makeFile(tooBig, function () {
 		  fs.readFile(largeFilePath, function (err) {
@@ -37,7 +37,7 @@ describe('fs.readFile', function () {
 		})
 	})
 
-	it("should fail with err.code === 'ENOENT' on inexistant files", function (done) {
+	it("should fail with `err.code === 'ENOENT'` on inexistant files", function (done) {
 		var filename = path.join(__dirname, 'does_not_exist.txt')
 		fs.readFile(filename, 'raw', function (err, data) {
 			expect(err.code).to.equal("ENOENT")

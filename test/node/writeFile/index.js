@@ -66,6 +66,21 @@ describe('fs.writeFile', function () {
 		  expect(err).not.to.exist
 		  fs.unlinkSync(filename)
 		  done()
-		});
+		})
+	})
+
+	it("should fail with `err.code === 'ENAMETOOLONG'` on 1000-character-long file paths", function (done) {
+		var filenameLen = Math.max(1000 - __dirname.length - 1, 1)
+		var filename = path.join(__dirname, new Array(filenameLen + 1).join('x'))
+		try {
+		  fs.unlinkSync(fullPath)
+		}
+		catch (e) {
+		  // Ignore.
+		}
+		fs.writeFile(filename, 'ok', function (err) {
+		  expect(err.code).to.equal("ENAMETOOLONG")
+		  done()
+		})
 	})
 })
