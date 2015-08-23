@@ -4,27 +4,29 @@ var Promise = require('promise')
 var fs = require('../../../lib/server')
 var mkdirp = Promise.denodeify(fs.mkdirp)
 var remove = Promise.denodeify(fs.remove)
+var readFile = Promise.denodeify(fs.readFile)
 var readJSON = Promise.denodeify(fs.readJSON)
 var writeJSON = Promise.denodeify(fs.writeJSON)
 var tmpPath = path.join(__dirname, 'tmp')
 var fileName = 'file.json'
+var filePath = path.join(tmpPath, fileName)
 
 describe('fs.writeJSON', function () {
 	describe("file", function () {
-		it("should write stringified JSON", function (done) {
-			var filename = path.join(__dirname, 'tmp.json')
+		afterEach(function () {
+			return remove(tmpPath)
+		})
+		it("should write stringified JSON", function () {
 			var obj = {
 				key: "value"
 			}
-			fs.writeJSON(filename, obj, function (err) {
-				expect(err).not.to.exist
-				fs.readFile(filename, 'utf8', function (err, contents) {
-					expect(err).not.to.exist
-					expect(contents).to.equal('{"key":"value"}')
-					fs.unlinkSync(filename)
-					done()
+			return writeJSON(filePath, obj, { mkdirp: true })
+				.then(function () {
+				  return readFile(filePath, 'utf8')
 				})
-			})
+				.then(function (contents) {
+				  expect(contents).to.equal('{"key":"value"}')
+				})
 		})
 	})
 
@@ -38,14 +40,11 @@ describe('fs.writeJSON', function () {
 		before(function (done) {
 			handle = server.listen(port, done)
 		})
-		before(function () {
-			return mkdirp(tmpPath)
-		})
 
-		it("should return parsed JSON", function () {
+		it("should work with URLs", function () {
 			var url = "http://localhost:" + port
 			var filePath = path.join(tmpPath, fileName)
-			return writeJSON(filePath, url)
+			return writeJSON(filePath, url, { mkdirp: true })
 				.then(function () {
 					return readJSON(filePath)
 				})
