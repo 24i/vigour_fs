@@ -1,28 +1,32 @@
 # vigour-fs
 
-This is a simple implementation of the [node-fs](http://nodejs.org/api/fs.html) for client-side apps , if used on the server falls back to fs-gracefull. Most methods that you can use in node's fs are not supported tough! We plan to support the stream API in the future
+node's `fs` module ([`graceful-fs`](https://github.com/isaacs/node-graceful-fs), actually) with sugar on top + native support.
+
+## Supported platforms
+
+platform | support
+---|---
+node | full
+iOS | [partial](#user-content-native-methods)
+Android | [partial](#user-content-native-methods)
+Windows Phone | [partial](#user-content-native-methods)
+other | none
+
+
+This document describes only the sugar. For the meat and potatoes, refer to [the nodejs docs](https://nodejs.org/api/fs.html).
+
 
 ## Installation
 
-**Server:**
-	
     $ git clone git@github.com:vigour-js/vigour-fs
+    $ cd vigour-fs
     $ npm install
 
-**Client:**
+coming soon: `npm install vigour-fs`
 
-Use [browserify](https://github.com/substack/node-browserify) 
-	
-    $ browserify index.js > bundle.js
-
-Or use prebuild version
-
-```html
-<script src="https://dev.vigour.io/vigour-fs.min.js"></script>
-```
 ## Usage
 
-Just as you would use [node-fs](http://nodejs.org/api/fs.html)
+Same as node's `fs` module, e.g.
 
 ```javascript
 var fs = require('vigour-fs');
@@ -36,59 +40,62 @@ fs.writeFile('somefile.txt', 'some data', function(err) {
 })
 ```
 
-## API
+## Modification to node's `fs` "API"
 
-### fs.rootDir
-root directory of the filesystem
+All methods provided in `vigour-fs` that also exist in `fs` should behave exactly the same, except for these extra features:
 
-### fs.readFile(*filename*, [options], *callback*)
-Read files.
+<a name="mkdirp-option"></a>
+### mkdirp option
 
-Adds functionality to filename so it can also be a url in which case it will try to load the file from that url, optionally retrying if request fails (see [available options](#user-content-readFile-available-options))
+`fs.writeFile` can accept a `mkdirp` option, which will create the necessary subdirectories for the specified path to exist (using [the mkdirp module](https://github.com/substack/node-mkdirp)).
 
-Argument | Type | Description
------- | ---- | -----------
-filename | String or URL |  Filename can also include path
-options | String or Object | Client only supports encoding no flag
-callback | Function | Called with `callback(error)` if the operation failed, or `callback(null, data, response)` if the operation succeeded (`response.statusCode` is `200`), where *data* is the requested file and *response* is a full [http response object](http://nodejs.org/api/http.html#http_http_incomingmessage).
+```javascript
+fs.writeFile("path/with/inexistent/directories/file.txt"
+, "Hello World"
+, { mkdirp: true }
+, function (err) {
+  if (!err) {
+    console.log("File will be written to specified path, with subdirectories created as needed")
+  }
+})
+```
 
-<a name='readFile-available-options'></a>
-#### Available Options
+### read from URL
+
+`fs.readFile` and `fs.writeFile` can accept a URL as path, in which case they will perform a GET request to that url.
+
+```javascript
+fs.readFile('http://perdu.com', 'utf8', function (err, data) {
+  if (!err) {
+    console.log("html from perdu.com", data)
+  }
+})
+```
+
+```javascript
+fs.writeFile('perdu.html', 'http://perdu.com', 'utf8', function (err) {
+  if (!err) {
+    console.log("done")
+  }
+})
+```
+
+This comes with extra options.
+
 Option | Possible values | Default | Description
 ---|---|---|---
 url | <ul><li>`true`</li><li>`false`</li></ul> | `true` | Whether to treat *path* as a url. If false, treats *path* as a local file path. Otherwise, treats *path* as a url if and only if it starts with `http://` or `https://`
 followRedirects | <ul><li>`true`</li><li>`false`</li></ul> | `true` | Whether to follow redirects (301, 302, 303, 305, 307, 308)
 maxTries | *Positive integer above 0* | `1` | Number of attempts to make in total. If over 1, will retry the request if the response's status code is 500 or 503. Use the [`retryOn404`](#user-content-readFile-retryOn404) option to retry on 404 as well (not recommended).
-<a name='readFile-retryDelay'></a>retryDelay | *Positive integer*  | `500` | Time to wait before retrying the first time, in milliseconds. Subsequent attempts may use a different delay, dependant on the [`retryDelayType`](#user-content-readFile-retryDelayType) option. The delay may also be given by a 'retry-after' header accompanying a 503 response (see the [`respectRetryAfter`](#user-content-readFile-respectRetryAfter) option). In any case, the delay is capped by the [`maxRetryDelay` options](#user-content-readFile-maxRetryDelay).
+<a name='readFile-retryDelay'></a>retryDelay | *Positive integer*  | `500` | Time to wait before retrying the first time, in milliseconds. Subsequent attempts may use a different delay, dependant on the [`retryDelayType`](#user-content-readFile-retryDelayType) option. The delay may also be given by a 'retry-after' header accompanying a 503 response (see the [`respectRetryAfter`](#user-content-readFile-respectRetryAfter) option). In any case, the delay is capped by the [`maxRetryDelay`](#user-content-readFile-maxRetryDelay) option.
 <a name='readFile-retryDelayType'></a>retryDelayType | <ul><li>`exp`</li><li>`linear`</li><li>`constant`</li></ul> | `exp` | Time to wait before retrying, in milliseconds, as a function of the attempt number (`tryNb`) and the original delay (`retryDelay`) specified in the [`retryDelay`](#user-content-readFile-retryDelay) option <dl><dt>exp</dt><dd>`retryDelay * 2 ^ tryNb`</dd><dt>linear</dt><dd>`retryDelay * tryNb`</dd><dt>*anything else*</dt><dd>`retryDelay`</dd></dl>
-<a name='readFile-respectRetryAfter'></a>respectRetryAfter | <ul><li>`true`</li><li>`false`</li></ul> | `true` | Whether to respect the delay provided in a `retry-after` header when receiving a 503 response. True will respect the received delay, false will ignore it and use the [`retryDelayType`](#user-content-readFile-retryDelayType) and [`retryDelay`](#user-content-readFile-retryDelay) options to determine the delay. In any case, the delay is capped by the [`maxRetryDelay` options](#user-content-readFile-maxRetryDelay).
-<a name='readFile-maxRetryDelay'></a>maxRetryDelay | *Positive integer above 0* | `60000` | Maximum time to wait before retrying, in milliseconds. Overrides Retry-After response-headers (see the [`respectRetryAfter` option](#user-content-readFile-respectRetryAfter)) and normal retry delay increments (see the [`retryDelay` option](#user-content-readFile-retryDelay)).
+<a name='readFile-respectRetryAfter'></a>respectRetryAfter | <ul><li>`true`</li><li>`false`</li></ul> | `true` | Whether to respect the delay provided in a `retry-after` header when receiving a 503 response. True will respect the received delay, false will ignore it and use the [`retryDelayType`](#user-content-readFile-retryDelayType) and [`retryDelay`](#user-content-readFile-retryDelay) options to determine the delay. In any case, the delay is capped by the [`maxRetryDelay`](#user-content-readFile-maxRetryDelay) option.
+<a name='readFile-maxRetryDelay'></a>maxRetryDelay | *Positive integer above 0* | `60000` | Maximum time to wait before retrying, in milliseconds. Overrides Retry-After response-headers (see the [`respectRetryAfter`](#user-content-readFile-respectRetryAfter)) option and normal retry delay increments (see the [`retryDelay`](#user-content-readFile-retryDelay)) option.
 <a name='readFile-retryOn404'></a>retryOn404 | <ul><li>`true`</li><li>`false`</li></ul> | `false` | Whether to retry when response status code is 404. This looks stupid, and most of the time it will be. It is recommended to leave the default in for this one.
 
 #### Examples
 ```javascript
-fs.readFile('somefile.txt', function(err, data) {
-  console.log(data, err)
-})
-
-fs.readFile('somefile.txt', 'utf8', function(err, data) {
-  console.log(data, err)
-})
-
-fs.readFile('somefile.txt', { encoding: 'utf8' }, function(err, data) {
-  console.log(data, err)
-})
-
-fs.readFile('http://www.example.com/test.txt'
-  , { encoding: 'utf8' }
-  , function(err, data) {
-    if (!err) {
-      console.log('response header', data.head)
-      console.log('response body', data.body)
-    }
-  })
-
-fs.readFile('http://www.example.com/test.txt'
+fs.readFile('http://perdu.com'
   , {
     encoding: 'utf8'
     , maxTries: 5
@@ -97,179 +104,159 @@ fs.readFile('http://www.example.com/test.txt'
     , retryOn404: true
     , respectRetryAfter: true
   }
-  , function(err, data) {
+  , function(err, str) {
     if (!err) {
-      console.log('response header', data.head)
-      console.log('response body', data.body)
+      console.log('Contents:', str)
     }
   })
 ```
 
-### fs.writeFile(*filename*, data, [options], *callback*)
-Write file
-
-Adds functionality to data so it can also be a url in which case it will try to get the data from that url (excluding the header) and write it to the file. On node, *writeFile* can be configured to retry if request fails by passing in the appropriate options (see [`fs.readFile` options](#user-content-readFile-available-options)). On native devices, no retries are made, no matter what the options are.
-
-Argument | Type | Description
---- | --- | ---
-filename | String | Filename can also include path
-data | String or Buffer or URL | Buffer can create difficulties on certain clients, use with caution.
-callback | Function | Called with `callback(error)` if the operation failed, or `callback(null)` if the operation succeeded.
-
-#### Available options
-Same as [`fs.readFile` options](#user-content-readFile-available-options)
-
-#### Examples
 
 ```javascript
-fs.writeFile('somefile.txt', 'data in a string', function(err) {
-  if(!err) console.log('succes!')
-})
-
-fs.writeFile('somefile.txt','http://www.google.com', function(err) {
-  if(!err) console.log('succes!')
-  else console.log(err)
-})
-
-//if you do not want urls to be parsed add an option url:false
-fs.writeFile('somefile.txt'
-  ,'http://www.google.com'
-  , { url: false }
+fs.writeFile('file.txt'
+  , 'http://perdu.com'
+  , {
+    encoding: 'utf8'
+    , maxTries: 5
+    , retryDelayType: 'exp'
+    , retryDelay: 100
+    , retryOn404: true
+    , respectRetryAfter: true
+  }
   , function(err) {
-    if(!err) console.log('succes!')
-    else console.log(err)
+    if (!err) {
+      console.log("file.txt now contains the html from perdu.com")
+    }
   })
 ```
-### fs.readdir( *path*, *callback* )
-Reads directory returns an array
-
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-path | String | |  path
-callback | function() | |  Callback
 
 ```javascript
-fs.readdir('somefolder', function(err, files) {
-  if(!err) console.log('succes!', files)
-})
-```
-### fs.mkdir( *path*,[ *options* ], *callback* )
-Create a directory
-
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-path | String | |  path
-callback | function() | |  Callback
-options | Mode | | Defaults to 0777
-
-```javascript
-fs.mkdir('somefolder', function(err) {
-  if(!err) console.log('succes!')
-})
-```
-### fs.rmdir( *path*, *callback* )
-Remove a directory only works when its empty (POSIX)
-
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-path | String | |  path
-callback | function() | |  Callback
-
-```javascript
-fs.rmdir('somefolder', function(err) {
-  if(!err) console.log('succes!')
-})
+fs.writeFile('file.txt'
+  ,'http://perdu.com'
+  , { url: false }
+  , function(err) {
+    if (!err) {
+      console.log('file.txt now contains the string "http://perdu.com"')
+    }
+  })
 ```
 
-### fs.rename( *oldPath*, *newPath*, *callback* )
-Rename a file, can also use this to move files
-
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-oldPath | String | |  old path
-newPath | String | |  new path
-callback | function() | |  Callback
-
-```javascript
-fs.rename('bla/somefolder', 'bur/somefolder/' function(err) {
-  if(!err) console.log('succes!')
-})
-```
-### fs.unlink( *path*, *callback* )
-Remove a file 
-
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-path | String | |  path
-callback | function() | |  Callback
-
-```javascript
-fs.rename('bla/somefile.txt', function(err) {
-  if(!err) console.log('succes!')
-})
-```
-### fs.exists( *path*, *callback* )
-Check if a file or folder exists
-
-Argument | Type | Description
------- | ---- | -----------
-path | String | path
-callback | Function | Called with `callback(exists)` where *exists* is `true` if the file exists, `false` otherwise
-
-```javascript
-fs.exists('bla/somefolder', function(exists) {
-  if(exists) console.log('exists!')
-})
-```
-
-### fs.stat( *path*, *callback* )
-Check if a file or folder exists
-
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-oldPath | String | |  old path
-newPath | String | |  new path
-callback | function() | |  Callback
-
-```javascript
-fs.exists('bla/somefolder', function(err, stats) {
-  if(!err) console.log(stats)
-})
-```
-Stat object only has creation date, modification date and accesed date
-
-Uses js [Date object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)
-```javascript
-{
-  atime: Date,
-  mtime: Date,
-  ctime: Date
-}
-```
+## New methods
 
 ### fs.remove( *path*, *callback* )
-This is an addition to node's fs uses rimraf module
-Remove a directory recursivly and clear all content, can also remove files
+Remove a file or directory recursively using [the rimraf module](https://github.com/isaacs/rimraf)
 
-Argument | Type | Default | Description
------- | ---- | ------- | -----------
-path | String | |  path
-callback | function() | |  Callback
+
+Argument | Type | Description
+---|---|---
+path | String | path
+callback | function (err) |  Callback
 
 ```javascript
-fs.remove('somefolder', function(err) {
-  if(!err) console.log('succes!')
+fs.remove('someDirectory', function(err) {
+  if (!err) {
+    console.log('success!')
+  }
+})
+
+fs.remove('someFile.txt', function(err) {
+  if (!err) {
+    console.log('success!')
+  }
 })
 ```
+
 ### fs.mkdirp( *path*, [ *options* ], *callback*)
-Addition to fs uses mkdirp package
-Create a new directory and any necessary subdirectories at dir with octal permission string opts.mode. If opts is a non-object, it will be treated as the opts.mode.
+Create any necessary subdirectories to allow *path* to exist. Also see `fs.writeFile`'s [mkdirp option](#user-content-mkdirp-option).
 
 Argument | Type | Default | Description
 ------ | ---- | ------- | -----------
-path | String | |  path
-options | Mode | 0777 | 
-callback | function() | |  Callback
+path | String | |  path to create
+options | Mode | 0777 |
+callback | function (err) | |  Callback
+
+```javascript
+fs.mkdirp('path/with/inexistent/directories', function (err) {
+  if (!err) {
+    console.log("All subdirectories have been created")
+  }
+})
+```
+
+### fs.readJSON( *path*, [ *options* ], *callback*)
+Reads a file and `JSON.parse`s it
+
+```javascript
+fs.readJSON('somefile.json', function (err, obj) {
+  if (!err) {
+      console.log(obj.key)
+  }
+})
+```
+
+### fs.writeJSON( *path*, *data*, [ *options* ], *callback*)
+`JSON.stringify`s *data* and writes the resulting string to *path*
+
+```javascript
+fs.writeJSON('somefile.json', { key: 'value' }, function (err) {
+  if (!err) {
+    console.log('somefile.json contains `{"key":"value"}`')
+  }
+})
+```
+
+### fs.editJSON( *path*, *fn*, [ *options* ], *callback*)
+Reads a file, `JSON.parse`s it, passes the result as a single parameter to *fn*, and writes whatever *fn* returns to that same file.
+
+```javascript
+fs.editJSON('somefile.json'
+, function (obj) {
+  obj.x += 1
+  return obj
+}
+, function (err) {
+  if (!err) {
+    console.log("done")
+  }
+})
+```
+
+*fn* can also return a promise
+
+```javascript
+fs.editJSON('somefile.json'
+, function (obj) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      obj.x += 1
+      resolve(obj)
+    }, 500)
+  })
+})
+```
+
+<a name='native-methods'></a>
+## Supported on native
+
+- `fs.readFile`
+- `fs.writeFile`
+- `fs.readdir`
+- `fs.mkdir`
+- `fs.rmdir`
+- `fs.rename`
+- `fs.unlink`
+- `fs.exists`
+- `fs.stat` (Only supports creation date, modification date and accessed date, all of which are [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) objects)
+- `fs.remove`
+
+### Native only
+
+#### fs.rootDir
+Root directory of the filesystem
+
+```javascript
+console.log(fs.rootDir)
+```
 
 ## License
 
