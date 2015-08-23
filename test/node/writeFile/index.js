@@ -53,6 +53,22 @@ describe('fs.writeFile', function () {
     })
   })
 
+  describe("url option", function () {
+    afterEach(function () {
+      return unlink(tmpFilename)
+    })
+    it("should write the URL to the file if `options.url === false`", function () {
+      var url = "http://perdu.com"
+      return writeFile(tmpFilename, url, { url: false })
+        .then(function () {
+          return readFile(tmpFilename, 'utf8')
+        })
+        .then(function (str) {
+          expect(str).to.equal(url)
+        })
+    })
+  })
+
   describe("mkdirp option", function () {
     var dirpath = path.join(__dirname, 'temporary')
     var filepath = path.join(dirpath, 'file.txt')
