@@ -1,3 +1,15 @@
+'use strict'
+
+// Linter never met Gaston, so we need to shut him up ourselves
+var describe = describe
+var it = it
+var before = before
+var beforeEach = beforeEach
+var after = after
+var afterEach = afterEach
+var expect = expect
+// Linter should be quiet now
+
 var path = require('path')
 var Promise = require('promise')
 var fs = require('../../../lib/server')
@@ -5,47 +17,47 @@ var writeFile = Promise.denodeify(fs.writeFile)
 var readFile = Promise.denodeify(fs.readFile)
 var unlink = Promise.denodeify(fs.unlink)
 var remove = Promise.denodeify(fs.remove)
-var strContent = '南越国是前203年至前111年存在于岭南地区的一个国家，国都位于番禺，疆域包括今天中国的广东、'
-  + '广西两省区的大部份地区，福建省、湖南、贵州、云南的一小部份地区和越南的北部。'
-  + '南越国是秦朝灭亡后，由南海郡尉赵佗于前203年起兵兼并桂林郡和象郡后建立。'
-  + '前196年和前179年，南越国曾先后两次名义上臣属于西汉，成为西汉的“外臣”。前112年，'
-  + '南越国末代君主赵建德与西汉发生战争，被汉武帝于前111年所灭。南越国共存在93年，'
-  + '历经五代君主。南越国是岭南地区的第一个有记载的政权国家，采用封建制和郡县制并存的制度，'
-  + '它的建立保证了秦末乱世岭南地区社会秩序的稳定，有效的改善了岭南地区落后的政治、##济现状。'
-  + '\n'
+var strContent = '南越国是前203年至前111年存在于岭南地区的一个国家，国都位于番禺，疆域包括今天中国的广东、' +
+  '广西两省区的大部份地区，福建省、湖南、贵州、云南的一小部份地区和越南的北部。' +
+   '南越国是秦朝灭亡后，由南海郡尉赵佗于前203年起兵兼并桂林郡和象郡后建立。' +
+   '前196年和前179年，南越国曾先后两次名义上臣属于西汉，成为西汉的“外臣”。前112年，' +
+   '南越国末代君主赵建德与西汉发生战争，被汉武帝于前111年所灭。南越国共存在93年，' +
+   '历经五代君主。南越国是岭南地区的第一个有记载的政权国家，采用封建制和郡县制并存的制度，' +
+   '它的建立保证了秦末乱世岭南地区社会秩序的稳定，有效的改善了岭南地区落后的政治、##济现状。' +
+   '\n'
 var bufContent = new Buffer(strContent, 'utf8')
 var numContent = 42
 var tmpFilename = path.join(__dirname, 'tmp.txt')
 
 describe('fs.writeFile', function () {
-  describe("normal usage", function () {
+  describe('normal usage', function () {
     afterEach(function () {
       return unlink(tmpFilename)
     })
-    it("should accept strings", function () {
+    it('should accept strings', function () {
       return writeFile(tmpFilename, strContent)
         .then(function () {
-            return readFile(tmpFilename, 'utf8')
+          return readFile(tmpFilename, 'utf8')
         })
         .then(function (str) {
           expect(str).to.equal(strContent)
         })
     })
 
-    it("should accept buffers", function () {
+    it('should accept buffers', function () {
       return writeFile(tmpFilename, bufContent)
         .then(function () {
-            return readFile(tmpFilename)
+          return readFile(tmpFilename)
         })
         .then(function (buffer) {
           expect(buffer).to.deep.equal(bufContent)
         })
     })
 
-    it("should accept numbers", function () {
+    it('should accept numbers', function () {
       return writeFile(tmpFilename, numContent)
         .then(function () {
-            return readFile(tmpFilename, 'utf8')
+          return readFile(tmpFilename, 'utf8')
         })
         .then(function (nb) {
           expect(nb).to.equal(numContent.toString())
@@ -53,12 +65,12 @@ describe('fs.writeFile', function () {
     })
   })
 
-  describe("url option", function () {
+  describe('url option', function () {
     afterEach(function () {
       return unlink(tmpFilename)
     })
-    it("should write the URL to the file if `options.url === false`", function () {
-      var url = "http://perdu.com"
+    it('should write the URL to the file if `options.url === false`', function () {
+      var url = 'http://perdu.com'
       return writeFile(tmpFilename, url, { url: false })
         .then(function () {
           return readFile(tmpFilename, 'utf8')
@@ -69,7 +81,7 @@ describe('fs.writeFile', function () {
     })
   })
 
-  describe("mkdirp option", function () {
+  describe('mkdirp option', function () {
     var dirpath = path.join(__dirname, 'temporary')
     var filepath = path.join(dirpath, 'file.txt')
 
@@ -87,13 +99,13 @@ describe('fs.writeFile', function () {
         })
     })
 
-    it("should create necessary directories when `options.mkdirp === true`", function () {
+    it('should create necessary directories when `options.mkdirp === true`', function () {
       after(function () {
         return remove(dirpath)
       })
       return writeFile(filepath, strContent, { mkdirp: true })
         .catch(function (reason) {
-          console.error("OOPS", reason)
+          console.error('OOPS', reason)
           throw reason
         })
         .then(function () {
@@ -105,8 +117,8 @@ describe('fs.writeFile', function () {
     })
   })
 
-  describe("long file paths", function () {
-    it("should handle 260-character-long file paths", function () {
+  describe('long file paths', function () {
+    it('should handle 260-character-long file paths', function () {
       var filenameLen = Math.max(260 - __dirname.length - 1, 1)
       var filename = path.join(__dirname, new Array(filenameLen + 1).join('x'))
 
@@ -123,7 +135,7 @@ describe('fs.writeFile', function () {
 
       return writeFile(filename, strContent)
         .catch(function (reason) {
-          expect(reason.code).to.equal("ENAMETOOLONG")
+          expect(reason.code).to.equal('ENAMETOOLONG')
         })
     })
 
