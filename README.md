@@ -1,24 +1,12 @@
 # vigour-fs
 
-node's `fs` module ([`graceful-fs`](https://github.com/isaacs/node-graceful-fs), actually) with sugar on top + native support.
+node's [`fs`](https://nodejs.org/api/fs.html) module with sugar on top + [native support](#user-content-supported-platforms).
+
+This document describes only the sugar. For the meat and potatoes, refer to [the nodejs docs](https://nodejs.org/api/fs.html).
 
 ## Versioning
 
 This module respects the [semver](http://semver.org/) versioning methodology
-
-## Supported platforms
-
-platform | support
----|---
-node | full
-iOS | [partial](#user-content-native-methods)
-Android | [partial](#user-content-native-methods)
-Windows Phone | [partial](#user-content-native-methods)
-other | none
-
-
-This document describes only the sugar. For the meat and potatoes, refer to [the nodejs docs](https://nodejs.org/api/fs.html).
-
 
 ## Installation
 
@@ -34,10 +22,6 @@ var fs = require('vigour-fs');
 fs.readFile('somefile.txt', 'utf8', function(err, data) {
   console.log(data, err)
 })
-
-fs.writeFile('somefile.txt', 'some data', function(err) {
-  console.log(err)
-})
 ```
 
 ## Modification to node's `fs` "API"
@@ -45,12 +29,12 @@ fs.writeFile('somefile.txt', 'some data', function(err) {
 All methods provided in `vigour-fs` that also exist in `fs` should behave exactly the same, except for these extra features:
 
 <a name="mkdirp-option"></a>
-### mkdirp option
+- ### mkdirp option
 
-`fs.writeFile` can accept a `mkdirp` option, which will create the necessary subdirectories for the specified path to exist (using [the mkdirp module](https://github.com/substack/node-mkdirp)).
+`fs.writeFile` accepts a `mkdirp` option, which will create any missing subdirectories
 
 ```javascript
-fs.writeFile("path/with/inexistent/directories/file.txt"
+fs.writeFile("path/with/inexistent/subdirectories/file.txt"
 , "Hello World"
 , { mkdirp: true }
 , function (err) {
@@ -60,7 +44,7 @@ fs.writeFile("path/with/inexistent/directories/file.txt"
 })
 ```
 
-### read from URL
+- ### read from URL
 
 `fs.readFile` and `fs.writeFile` can accept a URL as path, in which case they will perform a GET request to that url.
 
@@ -75,12 +59,12 @@ fs.readFile('http://perdu.com', 'utf8', function (err, data) {
 ```javascript
 fs.writeFile('perdu.html', 'http://perdu.com', 'utf8', function (err) {
   if (!err) {
-    console.log("done")
+    console.log("perdu.html now contains the html from perdu.com")
   }
 })
 ```
 
-This comes with extra options.
+This means `fs.readFile` and `fs.writeFile` comes with extra options.
 
 Option | Possible values | Default | Description
 ---|---|---|---
@@ -93,7 +77,7 @@ maxTries | *Positive integer above 0* | `1` | Number of attempts to make in tota
 <a name='readFile-maxRetryDelay'></a>maxRetryDelay | *Positive integer above 0* | `60000` | Maximum time to wait before retrying, in milliseconds. Overrides Retry-After response-headers (see the [`respectRetryAfter`](#user-content-readFile-respectRetryAfter)) option and normal retry delay increments (see the [`retryDelay`](#user-content-readFile-retryDelay)) option.
 <a name='readFile-retryOn404'></a>retryOn404 | <ul><li>`true`</li><li>`false`</li></ul> | `false` | Whether to retry when response status code is 404. This looks stupid, and most of the time it will be. It is recommended to leave the default in for this one.
 
-#### Examples
+### Examples
 ```javascript
 fs.readFile('http://perdu.com'
   , {
@@ -144,7 +128,7 @@ fs.writeFile('file.txt'
 ## New methods
 
 ### fs.remove( *path*, *callback* )
-Remove a file or directory recursively using [the rimraf module](https://github.com/isaacs/rimraf)
+Remove a file or directory recursively
 
 
 Argument | Type | Description
@@ -176,7 +160,7 @@ options | Mode | 0777 |
 callback | function (err) | |  Callback
 
 ```javascript
-fs.mkdirp('path/with/inexistent/directories', function (err) {
+fs.mkdirp('path/with/inexistent/subdirectories', function (err) {
   if (!err) {
     console.log("All subdirectories have been created")
   }
@@ -206,7 +190,7 @@ fs.writeJSON('somefile.json', { key: 'value' }, function (err) {
 ```
 
 ### fs.editJSON( *path*, *fn*, [ *options* ], *callback*)
-Reads a file, `JSON.parse`s it, passes the result as a single parameter to *fn*, and writes whatever *fn* returns to that same file.
+Reads the file found at *path*, `JSON.parse`s it, passes the result as a single parameter to *fn*, `JSON.stringify`s whatever *fn* returns, saves the resulting string to that same file and calls *callback*.
 
 ```javascript
 fs.editJSON('somefile.json'
@@ -224,6 +208,7 @@ fs.editJSON('somefile.json'
 *fn* can also return a promise
 
 ```javascript
+var Promise = require('promise')
 fs.editJSON('somefile.json'
 , function (obj) {
   return new Promise(function (resolve, reject) {
@@ -232,8 +217,33 @@ fs.editJSON('somefile.json'
       resolve(obj)
     }, 500)
   })
+}
+, function (err) {
+  if (!err) {
+    console.log("done")
+  }
 })
 ```
+
+## Native only
+
+### fs.rootDir
+Root directory of the filesystem
+
+```javascript
+console.log(fs.rootDir)
+```
+
+<a name='supported-platforms'></a>
+## Supported platforms
+
+platform | support
+---|---
+node | full
+iOS | partial
+Android | partial
+Windows Phone | partial
+other | none
 
 <a name='native-methods'></a>
 ## Supported on native
@@ -249,14 +259,11 @@ fs.editJSON('somefile.json'
 - `fs.stat` (Only supports creation date, modification date and accessed date, all of which are [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) objects)
 - `fs.remove`
 
-### Native only
+## Internals
 
-#### fs.rootDir
-Root directory of the filesystem
-
-```javascript
-console.log(fs.rootDir)
-```
+- `vigour-fs` is based on [`graceful-fs`](https://github.com/isaacs/node-graceful-fs)
+- `fs.mkdirp` and the `mkdirp` option available on `fw.writeFile` and `fs.writeJSON` use [node-mkdirp](https://github.com/substack/node-mkdirp)) internally
+- `fs.remove` uses [rimraf](https://github.com/isaacs/rimraf) internally
 
 ## License
 
