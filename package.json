@@ -1,7 +1,7 @@
 {
   "name": "vigour-fs",
   "version": "1.0.0",
-  "description": "fs used to generilize accros devices and platforms",
+  "description": "node's `fs` module with sugar on top + native support.",
   "main": "index.js",
   "scripts": {
     "test": "gaston tests node"
