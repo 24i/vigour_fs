@@ -1,14 +1,5 @@
 'use strict'
-
-// Linter never met Gaston, so we need to shut him up ourselves
-var describe = describe
-var it = it
-var before = before
-var beforeEach = beforeEach
-var after = after
-var afterEach = afterEach
-var expect = expect
-// Linter should be quiet now
+/* global describe, it, expect, after, beforeEach, afterEach */
 
 var path = require('path')
 var Promise = require('promise')
