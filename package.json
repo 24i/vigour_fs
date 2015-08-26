@@ -1,10 +1,10 @@
 {
   "name": "vigour-fs",
   "version": "1.0.0",
-  "description": "fs used to generilize accros devices and platforms",
+  "description": "node's `fs` module with sugar on top + native support.",
   "main": "index.js",
   "scripts": {
-    "test": "gaston tests node"
+    "test": "./node_modules/.bin/gaston tests node"
   },
   "repository": {
     "type": "git",
@@ -28,7 +28,8 @@
   "devDependencies": {
     "express": "^4.8.4",
     "npmlog": "0.1.x",
-    "promise": "^7.0.4"
+    "promise": "^7.0.4",
+    "gaston": "git+ssh://git@github.com:vigour-io/gaston.git#dev"
   },
   "dependencies": {
     "concat-stream": "^1.4.6",
