@@ -2,6 +2,10 @@
 
 node's `fs` module ([`graceful-fs`](https://github.com/isaacs/node-graceful-fs), actually) with sugar on top + native support.
 
+## Versioning
+
+This module respects the [semver](http://semver.org/) versioning methodology
+
 ## Supported platforms
 
 platform | support
@@ -18,11 +22,7 @@ This document describes only the sugar. For the meat and potatoes, refer to [the
 
 ## Installation
 
-    $ git clone git@github.com:vigour-js/vigour-fs
-    $ cd vigour-fs
-    $ npm install
-
-coming soon: `npm install vigour-fs`
+`npm install vigour-fs`
 
 ## Usage
 
