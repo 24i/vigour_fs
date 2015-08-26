@@ -16,7 +16,7 @@ describe('fs.readFile', function () {
   })
 
   it("should fail with `err.name === 'RangeError'` on files of (1024*1024*1024) bytes or more", function (done) {
-    this.timeout(10000)
+    this.timeout(15000)
     makeFile(tooBig, function () {
       fs.readFile(largeFilePath, function (err) {
         expect(err.name).to.equal('RangeError')
@@ -27,7 +27,7 @@ describe('fs.readFile', function () {
   })
 
   it('should succeed on files of less than (1024*1024*1024) bytes', function (done) {
-    this.timeout(10000)
+    this.timeout(15000)
     makeFile(bigButFine, function () {
       fs.readFile(largeFilePath, function (err) {
         expect(err).not.to.exist
