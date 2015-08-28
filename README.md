@@ -64,7 +64,7 @@ fs.writeFile('perdu.html', 'http://perdu.com', 'utf8', function (err) {
 })
 ```
 
-This means `fs.readFile` and `fs.writeFile` comes with extra options.
+This means `fs.readFile` and `fs.writeFile` come with extra options.
 
 Option | Possible values | Default | Description
 ---|---|---|---
