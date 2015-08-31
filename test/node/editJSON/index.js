@@ -1,6 +1,7 @@
+/* global describe, it, expect, before, beforeEach, after, afterEach, sinon */
+
 var path = require('path')
 var express = require('express')
-var log = require('npmlog')
 var Promise = require('promise')
 var fs = require('../../../lib/server')
 var mkdirp = Promise.denodeify(fs.mkdirp)
@@ -17,14 +18,14 @@ describe('fs.editJSON', function () {
     return mkdirp(tmpPath)
   })
   beforeEach(function () {
-    return writeJSON(filePath, {a:true,b:"hello"})
+    return writeJSON(filePath, { a: true, b: 'hello' })
   })
 
-  describe("file", function () {
-  	it("should edit the JSON file", function () {
-  		return editJSON(filePath, function (obj) {
+  describe('file', function () {
+    it('should edit the JSON file', function () {
+      return editJSON(filePath, function (obj) {
           obj.a = false
-          obj.b = "world"
+          obj.b = 'world'
           return obj
         })
         .then(function () {
@@ -32,16 +33,16 @@ describe('fs.editJSON', function () {
         })
         .then(function (obj) {
           expect(obj.a).to.equal(false)
-          expect(obj.b).to.equal("world")
+          expect(obj.b).to.equal('world')
         })
-  	})
+    })
 
-    it("should work with promises", function () {
-  		return editJSON(filePath, function (obj) {
+    it('should work with promises', function () {
+      return editJSON(filePath, function (obj) {
           return new Promise(function (resolve, reject) {
             setTimeout(function () {
               obj.a = false
-              obj.b = "world"
+              obj.b = 'world'
               resolve(obj)
             }, 250)
           })
@@ -51,12 +52,12 @@ describe('fs.editJSON', function () {
         })
         .then(function (obj) {
           expect(obj.a).to.equal(false)
-          expect(obj.b).to.equal("world")
+          expect(obj.b).to.equal('world')
         })
-  	})
+    })
   })
 
-  describe("http(s)", function () {
+  describe('http(s)', function () {
     var server = express()
     var port = 8000
     var handle
@@ -66,12 +67,12 @@ describe('fs.editJSON', function () {
     })
 
     it("should fail with `err.code === 'TypeError'` if path is a url", function () {
-      var url = "http://localhost:" + port + "/" + fileName
+      var url = 'http://localhost:' + port + '/' + fileName
       var spy = sinon.spy()
       expect(spy)
       return editJSON(url, spy)
         .catch(function (reason) {
-          expect(reason.code).to.equal("TypeError")
+          expect(reason.code).to.equal('TypeError')
         })
         .done(function () {
           expect(spy).to.not.be.called
