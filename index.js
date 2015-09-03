@@ -1,3 +1,3 @@
-module.exports = exports = require('vigour-js/util').isNode 
-	? require('./lib/server')
-	: require('./lib/client')
+module.exports = exports = (typeof window === 'undefined') ?
+	require('./lib/server') :
+	require('./lib/client')
