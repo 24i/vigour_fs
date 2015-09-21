@@ -46,5 +46,19 @@
     "through2": "^0.6.1",
     "xml2js": "^0.4.10"
   },
-  "homepage": "https://github.com/vigour-io/vigour-fs"
+  "homepage": "https://github.com/vigour-io/vigour-fs",
+  "standard": {
+    "globals": [
+      "describe",
+      "it",
+      "assert",
+      "expect",
+      "should",
+      "before",
+      "beforeEach",
+      "after",
+      "afterEach",
+      "sinon"
+    ]
+  }
 }
