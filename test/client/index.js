@@ -1,5 +1,5 @@
 try {
-    var cordova = require('vigour-js/browser/cordova')
+    var cordova = require('../../lib/cordova')
     function notify () {
         var args = arguments
         cordova.whenReady(function () {
