@@ -1,6 +1,6 @@
 {
   "name": "vigour-fs",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "node's `fs` module with sugar on top + native support.",
   "main": "index.js",
   "scripts": {
@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "concat-stream": "^1.4.6",
+    "cpr": "^0.4.2",
     "eventemitter3": "^0.1.2",
     "graceful-fs": "~3.0.2",
     "mkdirp": "^0.5.0",
