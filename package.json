@@ -4,7 +4,7 @@
   "description": "node's `fs` module with sugar on top + native support.",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/gaston test node"
+    "test": "gaston test node"
   },
   "repository": {
     "type": "git",
