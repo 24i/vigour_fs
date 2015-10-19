@@ -33,8 +33,7 @@
   "devDependencies": {
     "express": "^4.8.4",
     "npmlog": "0.1.x",
-    "promise": "^7.0.4",
-    "gaston": "^0.13.1"
+    "promise": "^7.0.4"
   },
   "dependencies": {
     "concat-stream": "^1.4.6",
