@@ -5,3 +5,7 @@ node_modules
 *.mp4
 test/client/native
 test/server/files/out*
+test/bundle.js
+test/mocha.css
+test/mocha.js
+test/test-runner.html
