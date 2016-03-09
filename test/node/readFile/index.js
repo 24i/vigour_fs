@@ -2,6 +2,9 @@
 
 var path = require('path')
 var fs = require('../../../lib/server')
+var getUrl = require('../../helpers/geturl')
+var Promise = require('promise')
+var readFile = Promise.denodeify(fs.readFile)
 var exec = require('child_process').exec
 
 describe('fs.readFile', function () {
@@ -51,6 +54,15 @@ describe('fs.readFile', function () {
       expect(stdout).to.equal(dataExpected)
       expect(stderr).to.equal('')
       done()
+    })
+  })
+  it('should accept URLs', function () {
+    var url = 'http://perdu.com'
+    return Promise.all([
+      readFile(url, 'utf8'),
+      getUrl(url)
+    ]).then(function (vals) {
+      expect(vals[0]).to.equal(vals[1])
     })
   })
 })

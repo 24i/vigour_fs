@@ -8,6 +8,7 @@ var writeFile = Promise.denodeify(fs.writeFile)
 var readFile = Promise.denodeify(fs.readFile)
 var unlink = Promise.denodeify(fs.unlink)
 var remove = Promise.denodeify(fs.remove)
+var getUrl = require('../../helpers/geturl')
 var strContent = '南越国是前203年至前111年存在于岭南地区的一个国家，国都位于番禺，疆域包括今天中国的广东、' +
   '广西两省区的大部份地区，福建省、湖南、贵州、云南的一小部份地区和越南的北部。' +
    '南越国是秦朝灭亡后，由南海郡尉赵佗于前203年起兵兼并桂林郡和象郡后建立。' +
@@ -53,6 +54,18 @@ describe('fs.writeFile', function () {
         .then(function (nb) {
           expect(nb).to.equal(numContent.toString())
         })
+    })
+    it('should accept URLs', function () {
+      var url = 'http://perdu.com'
+      return Promise.all([
+        writeFile(tmpFilename, url)
+          .then(function () {
+            return readFile(tmpFilename, 'utf8')
+          }),
+        getUrl(url)
+      ]).then(function (vals) {
+        expect(vals[0]).to.equal(vals[1])
+      })
     })
   })
 
@@ -129,6 +142,5 @@ describe('fs.writeFile', function () {
           expect(reason.code).to.equal('ENAMETOOLONG')
         })
     })
-
   })
 })
