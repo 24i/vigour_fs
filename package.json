@@ -1,6 +1,6 @@
 {
   "name": "vigour-fs",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "node's `fs` module with sugar on top + native support.",
   "main": "index.js",
   "scripts": {
